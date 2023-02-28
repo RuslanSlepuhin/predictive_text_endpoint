@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 import requests
 import json
+from request_front import request_front
 
 app = Flask(__name__)
 
@@ -16,20 +17,57 @@ def get_vacancies_by_query_flask(query):
     return vacancies_data.get('vacancies', [])
 
 
-
-@app.route('/get-vacancies-by-query', methods=['POST'])
+# please use the another endpoint name. I will compose your code to the common project and endpoints must be different
+@app.route('/get-vacancies-by-query2', methods=['POST'])
 def get_vacancies_by_query():
+
+    """
+    request from frontend looks like
+    {
+        "direction": "jun",  this is field for searching vacancy name. It's title or vacancy_name fields in DB
+        "specialization": [],
+        "programmingLanguage": [],
+        "technologies": [],
+        "level": [],  it is level field in Database
+        "country": [],
+        "city": [],  city in Database
+        "state": [],
+        "salary": [],  salary in database
+        "salaryOption": [],
+        "companyScope": [],
+        "typeOfEmployment": [],
+        "companyType": [],
+        "companySize": [],
+        "job_type": []  it is job_type in database
+    }
+
+    I put this request in additional file name is request_front.py. You can use it, run code to see it works or not.
+    Or you can use the Postman for send requests to your endpoints
+
+    """
 
     request_data = request.get_json()
 
+    # you can try to use the static request from file
+    request_data = request_front
 
     query = "WHERE 1=1"
     if 'profession' in request_data and request_data['profession']:
         query += f" AND profession IN {tuple(request_data['profession'])}"
+        """
+        professions are separated by commas like "backend, frontend, junior
+        and "profession" is not in request from frontend
+        the fields from frontend and fields from database are not the same
+        """
+
     if 'direction' in request_data and request_data['direction']:
         query += f" AND direction IN {tuple(request_data['direction'])}"
+        # direction is not the database field
+
     if 'specialization' in request_data and request_data['specialization']:
         query += f" AND specialization IN {tuple(request_data['specialization'])}"
+        # specialization is not the database field
+
     if 'city' in request_data and request_data['city']:
         query += f" AND city IN {tuple(request_data['city'])}"
     if 'salary' in request_data and request_data['salary']:
